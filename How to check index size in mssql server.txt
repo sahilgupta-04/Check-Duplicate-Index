@@ -1,0 +1,17 @@
+SELECT
+    OBJECT_NAME(i.object_id) AS table_name,
+    i.name AS index_name,
+    SUM(s.used_page_count) * 8 / 1024.0 AS index_size_mb
+FROM
+    sys.dm_db_partition_stats AS s
+INNER JOIN
+    sys.indexes AS i ON s.object_id = i.object_id
+                      AND s.index_id = i.index_id
+INNER JOIN
+    sys.objects AS o ON i.object_id = o.object_id
+WHERE
+    o.type_desc = 'USER_TABLE'
+    AND OBJECT_NAME(i.object_id) = 'warehouseentry'--(table name)
+    --AND i.name = 'Ind_WarehosueEntry_Isdeleted'--(index name)
+GROUP BY
+    OBJECT_NAME(i.object_id), i.name;
